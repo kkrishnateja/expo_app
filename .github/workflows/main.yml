@@ -1,0 +1,54 @@
+name: CI/CD Pipeline for FARM Stack
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Frontend Image
+        id: build-and-push-frontend
+        uses: docker/build-push-action@v4
+        with:
+          context: frontend
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/money-tracker-frontend:latest
+
+      - name: Log Frontend Image Digest
+        run: "echo Frontend Image Digest: ${{ steps.build-and-push-frontend.outputs.digest }}"
+
+      - name: Build and Push Backend Image
+        id: build-and-push-backend
+        uses: docker/build-push-action@v4
+        with:
+          context: backend
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/money-tracker-backend:latest
+
+      - name: Log Backend Image Digest
+        run: "echo Backend Image Digest: ${{ steps.build-and-push-backend.outputs.digest }}"
+
+      - name: Build and Push Mongo Image
+        id: build-and-push-mongo
+        uses: docker/build-push-action@v4
+        with:
+          context: mongo
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/money-tracker-mongo:latest
+
+      - name: Log Mongo Image Digest
+        run: "echo Mongo Image Digest: ${{ steps.build-and-push-mongo.outputs.digest }}"
