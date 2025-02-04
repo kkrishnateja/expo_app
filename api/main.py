@@ -3,6 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi.middleware.cors import CORSMiddleware
 from models.model import Transaction
 from bson import ObjectId  # Import ObjectId
+from fastapi import HTTPException
 
 app = FastAPI()
 
@@ -45,3 +46,27 @@ async def get_transactions():
 
     return transactions
 
+@app.put("/transactions/{transaction_id}")
+async def update_transaction(transaction_id: str, transaction: Transaction):
+    if not ObjectId.is_valid(transaction_id):  # Validate before using ObjectId
+        raise HTTPException(status_code=400, detail="Invalid transaction ID format")
+    
+    transaction_dict = transaction.model_dump()
+    result = await collection.update_one({"_id": ObjectId(transaction_id)}, {"$set": transaction_dict})
+
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    return {"message": "Transaction updated successfully"}
+
+@app.delete("/transactions/{transaction_id}")
+async def delete_transaction(transaction_id: str):
+    if not ObjectId.is_valid(transaction_id):  # Validate before using ObjectId
+        raise HTTPException(status_code=400, detail="Invalid transaction ID format")
+    
+    result = await collection.delete_one({"_id": ObjectId(transaction_id)})
+
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    return {"message": "Transaction deleted successfully"}

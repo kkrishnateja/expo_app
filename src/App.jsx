@@ -26,7 +26,7 @@ function App() {
 
     // Send new transaction to backend
     const response = await axios.post('http://localhost:8000/transactions', {
-      name: name.substring(price.length+1),
+      name: name.substring(price.length + 1),
       datetime,
       description,
       price,
@@ -52,10 +52,73 @@ function App() {
     balance = balance.toFixed(2);
     fraction = balance.split('.')[1];
     balance = balance.split('.')[0];
-    
+
     setFraction(fraction);
     setBalance(balance);
   }, [transactions]);
+
+  async function deleteTransaction(id) {
+    try {
+      await axios.delete(`http://localhost:8000/transactions/${id}`);
+      setTransactions(transactions.filter(transaction => transaction._id !== id));
+    } catch (error) {
+      console.error("Error deleting transaction", error);
+    }
+  }
+
+  // async function updateTransaction(id) {
+  //   try {
+  //     const updatedName = prompt("Enter new name:") || null;
+  //     const updatedPrice = prompt("Enter new price:") || null;
+  //     // const updatedDatetime = prompt("Enter new date/time:");
+  //     const updatedDescription = prompt("Enter new description:") || null;
+
+  //     if (updatedName) name = updatedName;
+  //     if (updatedPrice) price = parseFloat(updatedPrice) || 0;
+  //     // if (updatedDatetime) datetime = updatedDescription;
+  //     if (updatedDescription) description = updatedDescription;
+
+  //     const response = await axios.put(`http://localhost:8000/transactions/${id}`, {
+  //       name: updatedName,
+  //       price: updatedPrice,
+  //       datetime: datetime,
+  //       description: updatedDescription,
+  //     }, { headers: { "Content-Type": "application/json" } } );
+
+  //     setTransactions(transactions.map(transaction =>
+  //       transaction._id === id ? { ...transaction, name: updatedName, price: updatedPrice, description: updatedDescription } : transaction
+  //     ));
+  //   } catch (error) {
+  //     console.error("Error updating transaction:", error);
+  //   }
+  // }
+
+  async function updateTransaction(id) {
+    try {
+      const updatedName = prompt("Enter new name:", "") || null;
+      const updatedPrice = prompt("Enter new price:", "") || null;
+      const updatedDatetime = prompt("Enter new date/time (YYYY-MM-DDTHH:MM):", "") || null;
+      const updatedDescription = prompt("Enter new description:", "") || null;
+  
+      const updatedTransaction = {
+        name: updatedName || transactions.find(t => t._id === id).name,
+        price: updatedPrice ? parseFloat(updatedPrice) : transactions.find(t => t._id === id).price,
+        datetime: updatedDatetime || transactions.find(t => t._id === id).datetime,
+        description: updatedDescription || transactions.find(t => t._id === id).description,
+      };
+  
+      const response = await axios.put(`http://localhost:8000/transactions/${id}`, updatedTransaction, {
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      setTransactions(transactions.map(transaction =>
+        transaction._id === id ? { ...transaction, ...updatedTransaction } : transaction
+      ));
+    } catch (error) {
+      console.error("Error updating transaction:", error);
+    }
+  }
+  
 
   return (
     <>
@@ -96,6 +159,11 @@ function App() {
                   {Number(transaction.price) < 0 ? `-$${Math.abs(transaction.price)}` : `+$${transaction.price}`}
                 </div>
                 <div className="datetime">{transaction.datetime}</div>
+              </div>
+
+              <div className="transaction-btn">
+                <button onClick={() => updateTransaction(transaction._id)}>Update</button>
+                <button onClick={() => deleteTransaction(transaction._id)}>Delete</button>
               </div>
             </div>
           ))}
