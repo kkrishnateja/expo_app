@@ -2,14 +2,14 @@ version: "3.8"
 
 services:
   frontend:
-    image: kkrishnateja/money-tracker-frontend:latest
+    image: kkrishnateja05/money-tracker-frontend:latest
     ports:
       - "80:80"
     depends_on:
       - backend
 
   backend:
-    image: kkrishnateja/money-tracker-backend:latest
+    image: kkrishnateja05/money-tracker-backend:latest
     ports:
       - "8000:8000"
     environment:
@@ -18,7 +18,7 @@ services:
       - mongo
 
   mongo:
-    image: kkrishnateja/money-tracker-mongo:latest
+    image: kkrishnateja05/money-tracker-mongo:latest
     restart: always
     ports:
       - "27017:27017"
