@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   frontend:
     image: kkrishnateja05/money-tracker-frontend:latest
