@@ -24,7 +24,7 @@ jobs:
         id: build-and-push-frontend
         uses: docker/build-push-action@v4
         with:
-          context: .  # Root directory (expo_app)
+          context: .  
           file: ./Dockerfile  # Frontend Dockerfile in the root
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/money-tracker-frontend:latest
@@ -36,7 +36,7 @@ jobs:
         id: build-and-push-backend
         uses: docker/build-push-action@v4
         with:
-          context: .  # Root directory (expo_app)
+          context: .  
           file: ./api/Dockerfile  # Backend Dockerfile inside api directory
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/money-tracker-backend:latest
@@ -44,14 +44,12 @@ jobs:
       - name: Log Backend Image Digest
         run: "echo Backend Image Digest: ${{ steps.build-and-push-backend.outputs.digest }}"
 
-      - name: Build and Push Mongo Image
-        id: build-and-push-mongo
-        uses: docker/build-push-action@v4
-        with:
-          context: .  # Root directory (expo_app)
-          file: ./api/Dockerfile  # Mongo is assumed to be part of the backend's Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/money-tracker-mongo:latest
+      - name: Push MongoDB Image (Official Image)
+        id: push-mongo
+        run: |
+          docker pull mongo:latest
+          docker tag mongo:latest ${{ secrets.DOCKER_USERNAME }}/money-tracker-mongo:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/money-tracker-mongo:latest
 
-      - name: Log Mongo Image Digest
-        run: "echo Mongo Image Digest: ${{ steps.build-and-push-mongo.outputs.digest }}"
+      - name: Log MongoDB Image Digest
+        run: "echo Mongo Image Digest: ${{ steps.push-mongo.outputs.digest }}"
