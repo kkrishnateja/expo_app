@@ -10,10 +10,14 @@ body{
 
 main{
   max-width: 600px;
-  margin: 30px auto;
+  margin: 50px auto;
   padding: 20px;
   background-color: #1f1f1f;
   border-radius: 10px;
+}
+
+h1.header{
+  margin-bottom: 10px;
 }
 
 h1{

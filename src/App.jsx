@@ -122,7 +122,9 @@ function App() {
 
   return (
     <>
-      <main><h1 className={`${balance < 0 ? 'red' : 'green'}`}>{balance < 0 ? `-$${Math.abs(balance)}` : `+$${balance}`}
+      <main>
+        <h1 className='header'>Money Tracker</h1>
+        <h1 className={`${balance < 0 ? 'red' : 'green'}`}>{balance < 0 ? `-$${Math.abs(balance)}` : `+$${balance}`}
         <span>.{fraction}</span></h1>
         <form onSubmit={addNewTransaction}>
           <div className="basic">
@@ -147,7 +149,7 @@ function App() {
         </form>
 
         <div className="transactions">
-          {transactions.length > 0 && transactions.map((transaction, index) => (
+          {transactions.length > 0 && transactions.slice().reverse().map((transaction, index) => (
             <div className="transaction" key={index}>
               <div className="left">
                 <div className="name">{transaction.name}</div>
